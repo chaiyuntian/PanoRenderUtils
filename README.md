@@ -5,11 +5,11 @@ tool collection
 文件管理相关程序以及工具
 
 
-####Algorighthms\
+####algorithms\
 算法以及相关描述
 
 
-####Artworks\
+####artworks\
 渲染以及建模相关需要的小工具
 
 
