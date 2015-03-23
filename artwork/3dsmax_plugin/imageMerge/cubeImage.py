@@ -3,10 +3,10 @@ import os
 from PIL import Image
 
 '''
-images better be same height and same width(at least in on row)
+images better be same height and same width(at least in one row)
 '''
 
-
+# The function to merge a list of image into a big image matrix of row*col .
 def merge_faces(image_files, tgfile, tgwidth=0, row=2, col=3):
     border_size = 0
     imgs = []
@@ -54,6 +54,11 @@ def merge_faces(image_files, tgfile, tgwidth=0, row=2, col=3):
             index += 1
             out_img.save(tgfile)
 
+# The key funtion to merge image into three resolution levels(1920,1024,512).
+# @param image_folder: The parent folder to put all the six-face images in.
+# @param images: the images of six faces.
+#    Warning: Do not change the image list orders unless you know and can modify the UV coordinates of the cube.
+# @param format1: the images' file format.
 
 def merge_to_three_qualities(image_folder = 'Rendering'+os.sep+"cam",
                              images = [ 'up','front','down','back', 'right','left'],
@@ -74,7 +79,42 @@ def merge_to_three_qualities(image_folder = 'Rendering'+os.sep+"cam",
     merge_faces(image_files, tg3, 512)
     print "Processing Time:",clock()-t1
 
+def merge_to_one(image_folder = 'Rendering'+os.sep+"cam",tgFilename="",tgFolder="Production",
+                             images = [ 'up','front','down','back', 'right','left'],
+                             format1 = '.png'):
+    #image_folder = 'Rendering'+os.sep+"cam"
+    #images = ['back', 'front', 'left', 'right', 'up', 'down']
+    #format1 = '.png'
+    image_files = [image_folder + os.sep + img + format1 for img in images]
+    print(image_files)
+    tg2 = tgFolder + os.sep + tgFilename +".jpg"
+    from time import clock
+    t1=clock()
+    merge_faces(image_files, tg2, 1920)
+    print "Processing Time:",clock()-t1
+
+
 if __name__ == "__main__":
 
-    merge_to_three_qualities("GAP\\day\\Ambient_Spot")
-    merge_to_three_qualities("GAP\\day\\Focus_Track")
+    '''
+    merge_to_one("GAP\\no_ps\\off_Ambient_spot","P1_NG_N_AS")
+    merge_to_one("GAP\\no_ps\\off_Focus_track","P1_NG_N_FT")
+
+    merge_to_one("GAP\\no_ps\\on_Ambient_spot","P1_NG_D_AS")
+    merge_to_one("GAP\\no_ps\\on_Focus_track","P1_NG_D_FT")
+
+    merge_to_one("GAP\\ps\\off_Ambient_spot","P1_G_N_AS")
+    merge_to_one("GAP\\ps\\off_Focus_track","P1_G_N_FT")
+
+    merge_to_one("GAP\\ps\\on_Ambient_spot","P1_G_D_AS")
+    merge_to_one("GAP\\ps\\on_Focus_track","P1_G_D_FT")
+    
+    merge_to_one("GAP\\P2_Window\\all_off_model","P2_all_off_model")
+    merge_to_one("GAP\\P2_Window\\all_off_poster","P2_all_off_poster")
+    merge_to_one("GAP\\P2_Window\\off_model","P2_off_model")
+    merge_to_one("GAP\\P2_Window\\off_poster","P2_off_poster")
+    merge_to_one("GAP\\P2_Window\\on_model","P2_on_model")
+    '''
+    merge_to_one("GAP\\P2_Window\\on_poster","P2_on_poster")
+    
+        
