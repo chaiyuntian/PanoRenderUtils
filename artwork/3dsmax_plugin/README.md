@@ -9,3 +9,8 @@
 - .NET Framework: 编译目标为.NET 4.0 但是.NET 4.5也需要安装。
 - Microsoft Platform SDK：安装好VS之后自带。
 - 编译器：一个3ds Max版本只支持**唯一**的编译器。3Ds Max 2015只支持Visual C++ 11.0 Service Pack 3. Visual Studio 2012 Update 4.VS通常有不同的版本，Express，Desktop,Starndard, Ultimate。Autodesk官方推荐使用Starndard版本。
+
+
+#####文件目录
+- requirements: 渲染插件需求
+- imageMerge: 拼接渲染图像的python脚本。
