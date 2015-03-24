@@ -14,3 +14,4 @@
 #####文件目录
 - requirements: 渲染插件需求
 - imageMerge: 拼接渲染图像的python脚本。
+- history_ref: 历史中可供参考的渲染脚本。
