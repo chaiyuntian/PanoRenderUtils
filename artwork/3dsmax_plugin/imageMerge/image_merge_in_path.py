@@ -1,5 +1,6 @@
 # -*- coding:utf-8 -*-
 import os
+from os.path import isdir
 from PIL import Image
 
 '''
@@ -79,14 +80,23 @@ def merge_to_three_qualities(image_folder = 'Rendering'+os.sep+"cam",
     merge_faces(image_files, tg3, 512)
     print "Processing Time:",clock()-t1
 
+
+# The key funtion to merge image into one resolution levels = 1920.
+# @param image_folder: The parent folder to put all the six-face images in.
+# @param images: the images of six faces.
+#    Warning: Do not change the image list orders unless you know and can modify the UV coordinates of the cube.
+# @param format1: the images' file format.
 def merge_to_one(image_folder = 'Rendering'+os.sep+"cam",tgFilename="",tgFolder="Production",
-                             images = [ 'up','front','down','back', 'right','left'],
+                             images = [ 'u','f','d','b', 'r','l'],
                              format1 = '.png'):
-    #image_folder = 'Rendering'+os.sep+"cam"
-    #images = ['back', 'front', 'left', 'right', 'up', 'down']
-    #format1 = '.png'
+    
     image_files = [image_folder + os.sep + img + format1 for img in images]
     print(image_files)
+    if isdir(tgFolder):
+        pass
+    else:
+        os.mkdir(tgFolder)
+    
     tg2 = tgFolder + os.sep + tgFilename +".jpg"
     from time import clock
     t1=clock()
@@ -94,27 +104,53 @@ def merge_to_one(image_folder = 'Rendering'+os.sep+"cam",tgFilename="",tgFolder=
     print "Processing Time:",clock()-t1
 
 
+import re  
+
+# check if the input filenames match all the items in the face list
+# @param filenames - input filename list
+# @param facelist - six faces names
+# @param format - image format
+def matchFileList(filenames,facelist = [ 'u','f','d','b', 'r','l'],format = '.png'):
+    flist = [face+ format for face in facelist]
+    for f in filenames:
+        try:
+            flist.remove(f);
+        except:
+            pass
+    return flist
+        
+# Merge the files under the folder. Using os.walk to go through all the folders and check if  [ 'u','f','d','b', 'r','l'] is all present.
+# if yes then merge them all, name the target image with the hierach of the folder.
+# @param rootFolder - which folder to work with.
+def AutoMerge(rootFolder = os.getcwd()):
+    finished = []
+    unfinished = []
+    for dirpath, dirnames, filenames in os.walk(rootFolder):
+        lst = matchFileList(filenames)
+        if len(lst)>=6:
+            pass
+        elif len(lst)==0:
+            pathtemp = dirpath
+            pathtemp = pathtemp.replace(rootFolder+os.sep,'');
+            pathtemp = pathtemp.replace('\\','_')
+            print pathtemp
+            tgFilename = pathtemp+'.png'
+            merge_to_one(dirpath,tgFilename,rootFolder+os.sep+"Production")
+            finished.append(tgFilename)
+        else:
+            unfinished.append((dirpath,lst))
+            
+    print '-'*20,
+    print "Finished:",
+    print finished
+
+    print '-'*20,
+    print "UnFinished:",
+    print unfinished
+
+
 if __name__ == "__main__":
-
-    '''
-    merge_to_one("GAP\\no_ps\\off_Ambient_spot","P1_NG_N_AS")
-    merge_to_one("GAP\\no_ps\\off_Focus_track","P1_NG_N_FT")
-
-    merge_to_one("GAP\\no_ps\\on_Ambient_spot","P1_NG_D_AS")
-    merge_to_one("GAP\\no_ps\\on_Focus_track","P1_NG_D_FT")
-
-    merge_to_one("GAP\\ps\\off_Ambient_spot","P1_G_N_AS")
-    merge_to_one("GAP\\ps\\off_Focus_track","P1_G_N_FT")
-
-    merge_to_one("GAP\\ps\\on_Ambient_spot","P1_G_D_AS")
-    merge_to_one("GAP\\ps\\on_Focus_track","P1_G_D_FT")
+    AutoMerge()
     
-    merge_to_one("GAP\\P2_Window\\all_off_model","P2_all_off_model")
-    merge_to_one("GAP\\P2_Window\\all_off_poster","P2_all_off_poster")
-    merge_to_one("GAP\\P2_Window\\off_model","P2_off_model")
-    merge_to_one("GAP\\P2_Window\\off_poster","P2_off_poster")
-    merge_to_one("GAP\\P2_Window\\on_model","P2_on_model")
-    '''
-    merge_to_one("GAP\\P2_Window\\on_poster","P2_on_poster")
     
         
