@@ -2,12 +2,84 @@
 import os
 from os.path import isdir
 from PIL import Image
+import re
+import datetime
+import shutil
 
-'''
-images better be same height and same width(at least in one row)
-'''
+fileformat = re.compile(r'c\d{1,}_LG\d{1,}_IES\d{1,}_[f,b,l,r,u,d].png$')
+classify_folder = "classified"
 
+# Message System
+# warning, error and logs
+
+def warn(msg,code=1000):
+    if type(msg)==str:
+        print ("[warning code:%d]:"%code)+msg
+
+def error(msg,code=1000):
+    if type(msg)==str:
+        print ("[error code:%d]:"%code)+msg
+        
+def log(msg):
+    now = datetime.datetime.now()
+    data_str = "[log:"+now.strftime('@%Y-%m-%d %H:%M:%S')+']:'
+    print data_str+msg
+
+# usg regex to match filenames
+# @param path - filepath root
+def match_filename(path):
+    lst = os.listdir(path)
+    legal = []
+    illegal = []
+    for filename in lst:
+        m = re.match(fileformat,filename)
+        if m:
+            legal.append(filename)
+        else:
+            illegal.append(filename)
+    N = len(legal)
+    M = len(illegal)
+    log("legal filename count:%d, illegal filename count:%d"%(N,M))
+    if N%6 != 0:
+        warn("File missing prediction, some faces might be missing!")
+
+    return legal
+
+
+# Use the funciton under the condition:
+# all the legal filenames are inputted in to the parameter
+# put the files into different images according to their category
+def file2Folder(rootpath,filename):
+    lst = filename.split('_')
+    targetfile = lst.pop()
+    tgfolder = rootpath+os.sep+classify_folder
+    for p in lst:
+        tgfolder = os.path.join(tgfolder,p)
+    
+    if(isdir(tgfolder)):
+        pass
+    else:
+        os.makedirs(tgfolder)
+    source = os.path.join(rootpath,filename)
+    target =  os.path.join(tgfolder,targetfile)
+    shutil.copy(source, target)
+    log("copied file from source:'%s' to target:'%s'" %(source,target))
+
+# Classfy all the files into folders and report the illegal names.
+def ToCategory(rootpath):
+    lst = match_filename(rootpath)
+    for f in lst:
+        file2Folder(rootpath,f)
+
+
+
+# images better be same height and same width(at least in one row)
 # The function to merge a list of image into a big image matrix of row*col .
+# @param image_files - files to merge
+# @param tgfile - target filename
+# @param tgwidth - taget image resolution
+# @param row
+# @param col
 def merge_faces(image_files, tgfile, tgwidth=0, row=2, col=3):
     border_size = 0
     imgs = []
@@ -16,7 +88,7 @@ def merge_faces(image_files, tgfile, tgwidth=0, row=2, col=3):
     height = 0
 
     if num != row * col:
-        print 'pattern error'
+        error('pattern is wrong, num != row * col')
         return
     index = 0
 
@@ -69,7 +141,6 @@ def merge_to_three_qualities(image_folder = 'Rendering'+os.sep+"cam",
     #images = ['back', 'front', 'left', 'right', 'up', 'down']
     #format1 = '.png'
     image_files = [image_folder + os.sep + img + format1 for img in images]
-    print(image_files)
     tg1 = image_folder + os.sep + "quality1_001.jpg"
     tg2 = image_folder + os.sep + "quality2_001.jpg"
     tg3 = image_folder + os.sep + "quality3_001.jpg"
@@ -78,7 +149,7 @@ def merge_to_three_qualities(image_folder = 'Rendering'+os.sep+"cam",
     merge_faces(image_files, tg1, 1920)
     merge_faces(image_files, tg2, 1024)
     merge_faces(image_files, tg3, 512)
-    print "Processing Time:",clock()-t1
+    log("Processing Time:%f"%(clock()-t1))
 
 
 # The key funtion to merge image into one resolution levels = 1920.
@@ -91,20 +162,17 @@ def merge_to_one(image_folder = 'Rendering'+os.sep+"cam",tgFilename="",tgFolder=
                              format1 = '.png'):
     
     image_files = [image_folder + os.sep + img + format1 for img in images]
-    print(image_files)
     if isdir(tgFolder):
         pass
     else:
-        os.mkdir(tgFolder)
+        os.makedirs(tgFolder)
     
     tg2 = tgFolder + os.sep + tgFilename +".jpg"
     from time import clock
     t1=clock()
     merge_faces(image_files, tg2, 1920)
-    print "Processing Time:",clock()-t1
+    log("finished:%s, processing Time:%f"%(tg2,clock()-t1))
 
-
-import re  
 
 # check if the input filenames match all the items in the face list
 # @param filenames - input filename list
@@ -133,24 +201,23 @@ def AutoMerge(rootFolder = os.getcwd()):
             pathtemp = dirpath
             pathtemp = pathtemp.replace(rootFolder+os.sep,'');
             pathtemp = pathtemp.replace('\\','_')
-            print pathtemp
-            tgFilename = pathtemp+'.png'
+            tgFilename = pathtemp
             merge_to_one(dirpath,tgFilename,rootFolder+os.sep+"Production")
             finished.append(tgFilename)
         else:
             unfinished.append((dirpath,lst))
             
-    print '-'*20,
-    print "Finished:",
+    log("finished file list:")
     print finished
-
-    print '-'*20,
-    print "UnFinished:",
+    log("unfinished file list:")
     print unfinished
 
-
+# Category the files and Merge the images.
+def AutoExec(rootpath):
+    ToCategory(rootpath)
+    AutoMerge(rootpath+os.sep+classify_folder)
+    
 if __name__ == "__main__":
-    AutoMerge()
-    
-    
-        
+    AutoExec(os.getcwd())
+
+
