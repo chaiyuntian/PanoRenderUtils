@@ -90,6 +90,13 @@ def file2Folder(rootpath,filename):
 # Classfy all the files into folders and report the illegal names.
 def ToCategory(rootpath):
     lst,ill_lst = match_filename(rootpath)
+
+    # remove the old folder
+    tgfolder = rootpath+os.sep+classify_folder
+    if isdir(tgfolder):
+        shutil.rmtree(tgfolder)
+        print "Removing tree!"
+    
     for f in lst:
         file2Folder(rootpath,f)
 
@@ -265,8 +272,15 @@ def AutoExec(rootpath):
     log(' '*30+'End'+' '*30)
     log('*'*70)
     log(' '*70)
+    
 if __name__ == "__main__":
-    path = os.getcwd()
-    AutoExec(path) # Change the path to change folder
+    #path = os.getcwd()
+    #GUI
+    import Tkinter, tkFileDialog
+    root = Tkinter.Tk()
+    root.withdraw()
+    dirname = tkFileDialog.askdirectory(parent=root,initialdir="/",title='Pick a directory')
+    if dirname != '':
+        AutoExec(dirname) # Change the path to change folder
 
 
