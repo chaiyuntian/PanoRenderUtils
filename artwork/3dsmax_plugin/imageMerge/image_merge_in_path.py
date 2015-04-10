@@ -6,24 +6,44 @@ import re
 import datetime
 import shutil
 
-fileformat = re.compile(r'c\d{1,}_LG\d{1,}_IES\d{1,}_[f,b,l,r,u,d].png$')
+fileformat = re.compile(r'c\d{1,}_LG\d{1,}_IES\d{1,}_[f,b,l,r,u,d]\.png$')
+png_format = re.compile(r'.{1,}\.png$')
 classify_folder = "classified"
 
+log_time = datetime.datetime.now()
+logfilename = 'log'+ log_time.strftime('@%Y-%m-%d')+ '.txt'
+default_log_path = os.getcwd()+os.sep+logfilename
 # Message System
 # warning, error and logs
 
-def warn(msg,code=1000):
-    if type(msg)==str:
-        print ("[warning code:%d]:"%code)+msg
+# print to file
+def print2file(msg,fpath):
+    f=open(fpath,'a')
+    print >>f,msg
+    f.close()
 
-def error(msg,code=1000):
+def warn(msg,code=1000,fpath = default_log_path):
     if type(msg)==str:
-        print ("[error code:%d]:"%code)+msg
+        now = datetime.datetime.now()
+        msg = ("[warning code:%d]:"%code)+now.strftime('@%Y-%m-%d %H:%M:%S')+']:'+msg
+        print msg
+        print2file(msg,fpath)
         
-def log(msg):
-    now = datetime.datetime.now()
-    data_str = "[log:"+now.strftime('@%Y-%m-%d %H:%M:%S')+']:'
-    print data_str+msg
+
+def error(msg,code=1000,fpath = default_log_path):
+    if type(msg)==str:
+        now = datetime.datetime.now()
+        msg =  ("[error code:%d "%code)+now.strftime('@%Y-%m-%d %H:%M:%S')+']:'+msg
+        print msg
+        print2file(msg,fpath)
+        
+def log(msg,fpath = default_log_path):
+    if type(msg)==str:
+        now = datetime.datetime.now()
+        data_str = "[log:"+now.strftime('@%Y-%m-%d %H:%M:%S')+']:'
+        msg = data_str+msg
+        print msg
+        print2file(msg,fpath)
 
 # usg regex to match filenames
 # @param path - filepath root
@@ -36,14 +56,16 @@ def match_filename(path):
         if m:
             legal.append(filename)
         else:
-            illegal.append(filename)
+            m2 =  re.match(png_format,filename)
+            if m2:
+                illegal.append(filename)
+                
     N = len(legal)
     M = len(illegal)
     log("legal filename count:%d, illegal filename count:%d"%(N,M))
     if N%6 != 0:
         warn("File missing prediction, some faces might be missing!")
-
-    return legal
+    return legal,illegal
 
 
 # Use the funciton under the condition:
@@ -67,11 +89,11 @@ def file2Folder(rootpath,filename):
 
 # Classfy all the files into folders and report the illegal names.
 def ToCategory(rootpath):
-    lst = match_filename(rootpath)
+    lst,ill_lst = match_filename(rootpath)
     for f in lst:
         file2Folder(rootpath,f)
 
-
+    return ill_lst
 
 # images better be same height and same width(at least in one row)
 # The function to merge a list of image into a big image matrix of row*col .
@@ -206,18 +228,38 @@ def AutoMerge(rootFolder = os.getcwd()):
             finished.append(tgFilename)
         else:
             unfinished.append((dirpath,lst))
-            
-    log("finished file list:")
-    print finished
-    log("unfinished file list:")
-    print unfinished
+
+    return finished,unfinished
+
+# Report the illegal filenames and what is finished and what is unfinished.
+def Report(illegal,finished,missing):
+    log('-'*10+'finished file list:'+'-'*10)
+    k = 0
+    for f in finished:
+        k+=1
+        log("<%d>%s"%(k,f))
+        
+    log('-'*10+'missing file list:'+'-'*10)
+    k=0
+    for u in missing:
+        k+=1
+        log("<%d>%s"%(k,u))
+    
+    log('-'*10+'illegal file names:'+'-'*10)
+    k=0
+    for il in illegal:
+        k+=1
+        log("<%d>%s"%(k,il))
+
 
 # Category the files and Merge the images.
 def AutoExec(rootpath):
-    ToCategory(rootpath)
-    AutoMerge(rootpath+os.sep+classify_folder)
+    illegal = ToCategory(rootpath)
+    finished,missing = AutoMerge(rootpath+os.sep+classify_folder)
+    Report(illegal,finished,missing)
     
 if __name__ == "__main__":
-    AutoExec(os.getcwd())
+    path = os.getcwd()
+    AutoExec(path) # Change the path to change folder
 
 
