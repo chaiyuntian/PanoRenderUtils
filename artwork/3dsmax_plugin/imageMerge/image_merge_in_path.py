@@ -27,7 +27,7 @@ def warn(msg,code=1000,fpath = default_log_path):
         now = datetime.datetime.now()
         msg = ("[warning code:%d]:"%code)+now.strftime('@%Y-%m-%d %H:%M:%S')+']:'+msg
         print msg
-        print2file(msg,fpath)
+        #print2file(msg,fpath)
         
 
 def error(msg,code=1000,fpath = default_log_path):
@@ -35,7 +35,7 @@ def error(msg,code=1000,fpath = default_log_path):
         now = datetime.datetime.now()
         msg =  ("[error code:%d "%code)+now.strftime('@%Y-%m-%d %H:%M:%S')+']:'+msg
         print msg
-        print2file(msg,fpath)
+        #print2file(msg,fpath)
         
 def log(msg,fpath = default_log_path):
     if type(msg)==str:
@@ -85,7 +85,7 @@ def file2Folder(rootpath,filename):
     source = os.path.join(rootpath,filename)
     target =  os.path.join(tgfolder,targetfile)
     shutil.copy(source, target)
-    log("copied file from source:'%s' to target:'%s'" %(source,target))
+    #log("copied file from source:'%s' to target:'%s'" %(source,target))
 
 # Classfy all the files into folders and report the illegal names.
 def ToCategory(rootpath):
@@ -171,7 +171,7 @@ def merge_to_three_qualities(image_folder = 'Rendering'+os.sep+"cam",
     merge_faces(image_files, tg1, 1920)
     merge_faces(image_files, tg2, 1024)
     merge_faces(image_files, tg3, 512)
-    log("Processing Time:%f"%(clock()-t1))
+    #log("Processing Time:%f"%(clock()-t1))
 
 
 # The key funtion to merge image into one resolution levels = 1920.
@@ -193,7 +193,7 @@ def merge_to_one(image_folder = 'Rendering'+os.sep+"cam",tgFilename="",tgFolder=
     from time import clock
     t1=clock()
     merge_faces(image_files, tg2, 1920)
-    log("finished:%s, processing Time:%f"%(tg2,clock()-t1))
+    #log("finished:%s, processing Time:%f"%(tg2,clock()-t1))
 
 
 # check if the input filenames match all the items in the face list
@@ -254,10 +254,17 @@ def Report(illegal,finished,missing):
 
 # Category the files and Merge the images.
 def AutoExec(rootpath):
+    log(' '*70)
+    log('*'*70)
+    log(' '*30+'Start'+' '*30)
+    log('*'*70)
     illegal = ToCategory(rootpath)
     finished,missing = AutoMerge(rootpath+os.sep+classify_folder)
     Report(illegal,finished,missing)
-    
+    log('*'*70)
+    log(' '*30+'End'+' '*30)
+    log('*'*70)
+    log(' '*70)
 if __name__ == "__main__":
     path = os.getcwd()
     AutoExec(path) # Change the path to change folder
