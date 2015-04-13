@@ -23,27 +23,30 @@ def print2file(msg,fpath):
     f.close()
 
 def warn(msg,code=1000,fpath = default_log_path):
-    if type(msg)==str:
-        now = datetime.datetime.now()
-        msg = ("[warning code:%d]:"%code)+now.strftime('@%Y-%m-%d %H:%M:%S')+']:'+msg
-        print msg
-        #print2file(msg,fpath)
+    if type(msg)!=str:
+        msg = str(msg)
+    now = datetime.datetime.now()
+    msg = ("[warning code:%d]:"%code)+now.strftime('@%Y-%m-%d %H:%M:%S')+']:'+msg
+    print msg
+    #print2file(msg,fpath)
         
 
 def error(msg,code=1000,fpath = default_log_path):
-    if type(msg)==str:
-        now = datetime.datetime.now()
-        msg =  ("[error code:%d "%code)+now.strftime('@%Y-%m-%d %H:%M:%S')+']:'+msg
-        print msg
-        #print2file(msg,fpath)
+    if type(msg)!=str:
+        msg = str(msg)
+    now = datetime.datetime.now()
+    msg =  ("[error code:%d "%code)+now.strftime('@%Y-%m-%d %H:%M:%S')+']:'+msg
+    print msg
+    #print2file(msg,fpath)
         
 def log(msg,fpath = default_log_path):
-    if type(msg)==str:
-        now = datetime.datetime.now()
-        data_str = "[log:"+now.strftime('@%Y-%m-%d %H:%M:%S')+']:'
-        msg = data_str+msg
-        print msg
-        print2file(msg,fpath)
+    if type(msg)!=str:
+        msg = str(msg)
+    now = datetime.datetime.now()
+    data_str = "[log:"+now.strftime('@%Y-%m-%d %H:%M:%S')+']:'
+    msg = data_str+msg
+    print msg
+    print2file(msg,fpath)
 
 # usg regex to match filenames
 # @param path - filepath root
@@ -245,6 +248,7 @@ def Report(illegal,finished,missing):
     for f in finished:
         k+=1
         log("<%d>%s"%(k,f))
+
         
     log('-'*10+'missing file list:'+'-'*10)
     k=0
@@ -276,6 +280,7 @@ def AutoExec(rootpath):
 if __name__ == "__main__":
     #path = os.getcwd()
     #GUI
+    
     import Tkinter, tkFileDialog
     root = Tkinter.Tk()
     root.withdraw()
@@ -283,4 +288,5 @@ if __name__ == "__main__":
     if dirname != '':
         AutoExec(dirname) # Change the path to change folder
 
-
+    
+    
