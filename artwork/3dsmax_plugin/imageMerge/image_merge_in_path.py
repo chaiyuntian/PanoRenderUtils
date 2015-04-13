@@ -247,20 +247,20 @@ def Report(illegal,finished,missing):
     k = 0
     for f in finished:
         k+=1
-        log("<%d>%s"%(k,f))
+        log("(%d)%s"%(k,f))
 
         
     log('-'*10+'missing file list:'+'-'*10)
     k=0
     for u in missing:
         k+=1
-        log("<%d>%s"%(k,u))
+        log("(%d)%s"%(k,u))
     
     log('-'*10+'illegal file names:'+'-'*10)
     k=0
     for il in illegal:
         k+=1
-        log("<%d>%s"%(k,il))
+        log("(%d)%s"%(k,il))
 
 
 # Category the files and Merge the images.
@@ -287,6 +287,3 @@ if __name__ == "__main__":
     dirname = tkFileDialog.askdirectory(parent=root,initialdir="/",title='Pick a directory')
     if dirname != '':
         AutoExec(dirname) # Change the path to change folder
-
-    
-    
