@@ -1,4 +1,4 @@
-[Common Test Website](http://tool.chinaz.com/regex/)for regex, if you don't have a custom test tool.
+[Common Test Website](http://tool.chinaz.com/regex/) for regex, if you don't have a custom test tool.
 
 PNG format match: .{1,}\.png$
 
@@ -8,9 +8,10 @@ TO BE Tested:
 
 1.货币格式： '123123211312.333333'.replace(/(?=(?!^)(?:\d{3})+(?:\.|$))(\d{3}(\.\d+$)?)/g, ',$1') //输出 123,123,211,312.333333  ps：TCL 大牛推荐
 
-匹配中文字符的正则表达式： [u4e00-u9fa5]   
-　　评注：匹配中文还真是个头疼的事，有了这个表达式就好办了 
+匹配中文字符的正则表达式： [u4e00-u9fa5] 
+
 　　匹配双字节字符(包括汉字在内)：[^x00-xff] 
+　　
 　　评注：可以用来计算字符串的长度（一个双字节字符长度计2，ASCII字符计1） 
 　　匹配空白行的正则表达式：ns*r 
 　　评注：可以用来删除空白行 
